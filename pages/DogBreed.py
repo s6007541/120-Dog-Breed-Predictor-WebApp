@@ -44,14 +44,17 @@ unique = ['affenpinscher', 'afghan_hound', 'african_hunting_dog', 'airedale',
        'west_highland_white_terrier', 'whippet',
        'wire-haired_fox_terrier', 'yorkshire_terrier']
 
+
 st.markdown("""
     # Dog Breed Predictor
     This app predicts breed of dogs
     ***
          """)
+
 st.sidebar.markdown("# Dog Breed Classifier 🐶")
 
 imgfile = st.file_uploader("Upload Image of your Dog!", type = ['png','jpg','jpeg'])
+
 
 if imgfile != None:
     image = Image.open(imgfile)
@@ -62,11 +65,25 @@ if imgfile != None:
 
     result = model.predict(tf.expand_dims(img,axis=0))
     print(unique[result.argmax()] + ' : ' + str(result.max()))
-    st.markdown(unique[result.argmax()] + ' : ' + str(result.max()))
+    
+    text_prediction = "We predict ....  \"" + " ".join([i.capitalize() for i in unique[result.argmax()].split("_")]) + '" !!'
+    text_confidence = 'With confidence : ' + str(round(result.max(),4)*100)[:5] + "%"
+    
+    st.markdown(""" <style> .font {
+        font-size:30px ; font-family: 'Cooper Black'; color: #FF9633;} 
+        </style> """, unsafe_allow_html=True)
+    st.markdown(""" <style> .font2 {
+        font-size:25px ; font-family: 'Cooper Black'; color: rgb(54, 173, 84);} 
+        </style> """, unsafe_allow_html=True)
+    
+    st.markdown('<p class="font">{}</p>'.format(text_prediction), unsafe_allow_html=True)
+    st.markdown('<p class="font2">{}</p>'.format(text_confidence), unsafe_allow_html=True)
+
+
     
     st.subheader('Confidence Level')
     result = result.flatten()
-    result = np.around(result,decimals = 2)
+    result = np.around(result,decimals = 4)
     df = pd.DataFrame({'Breed' : unique,'Confidence' : result})
     
     fig = px.pie(df, values='Confidence', names='Breed')
